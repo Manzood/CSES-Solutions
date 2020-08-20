@@ -2,30 +2,32 @@
 using namespace std;
 #define debug(x) cout<<#x<<" = "<<x<<endl;
 
-//algorithm: figure out the binary search once and for all, then use it to find the last element greater than or equal to the given number.
-// I'm too tired to do this at the moment, but I will eventually return to this.
-
-set <int> used;
-int search (vector <int> a, int val) {
-	int low=0, high=a.size()-1;
-	int mid=(low+high)/2;
-	while (low<=high) {
-
-	}
-	return mid;
-}
-
 int main() {
-	int n,m;
-	cin>>n>>m;
-	vector <int> a(n);
-	vector <int> cust(m);
-	for (int i=0;i<n;i++) {
-		scanf("%d",&a[i]);
+	int n, m;
+	cin >> n >> m;
+	vector <int> tickets(n);
+	vector <int> customers(m);
+	for (int i=0; i<n; i++) {
+		scanf("%d", &tickets[i]);
 	}
-	for (int i=0;i<m;i++) {
-		scanf("%d",&cust[i]);
+	for (int i=0; i<m; i++) {
+		scanf("%d", &customers[i]);
 	}
-	sort(a.begin(),a.end());
-
+	sort(tickets.begin(), tickets.end());
+	vector <int> ans;
+	for (int i=0; i<m; i++) {
+		for (int j=0; j<n; j++) {
+			if (j > 0 && tickets[j] <= customers[i]) {
+				ans.push_back(tickets[j-1]);
+				tickets[j-1] = -1;
+				// debug(j);
+				break;
+			}
+			else if (j == 0 && tickets[j] > customers[i]) {
+				ans.push_back(-1);
+				break;
+			}
+		}
+	}
+	for (int x: ans) printf("%d\n", x);
 }
