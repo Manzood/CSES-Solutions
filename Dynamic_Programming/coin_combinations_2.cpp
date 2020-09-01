@@ -3,7 +3,12 @@ using namespace std;
 #define debug(x) cout<<#x<<" = "<<x<<endl;
 #define sz(x) (int) (x).size()
 const int MOD = 1e9+7;
-// eventually, I will solve this problem properly
+// I believe that the second dimension of DP is important here
+// first dimension is the number, and the second is the number of ways to get that sum with that coin used at the end 
+// A further observation to reduce the complexity from O(n*k*k) to O(n*k) : d[i][k] will be dp[i-1][k] + dp[i][k-1], because we are redoing certain calculations here too
+// It can be classified as dp within dp, of sorts
+// Perhaps this is, in fact, incorrect?
+// I feel close? I really hope to figure this out
 
 int main() {
     int n, x;
@@ -13,35 +18,26 @@ int main() {
         scanf("%d", &coins[i]);
     }
     sort(coins.begin(), coins.end());
-    vector <int> dp(x+1);
-    dp[0] = 1;
-    vector <vector <int>> last(x+1);
-    for (int i = 1; i <= x; i++) {
-        dp[i] = 0;
-        for (int k = 0; k < n; k++) {
-            int c = coins[k];
-            last[i].push_back(0);
-            if (i - c > 0) {
-                for (int j = 0; j < n; j++) {
-                    if (coins[j] <= c) {
-                        dp[i] += last[i-c][j];
-                        last[i][k] += last[i-c][j];
-                        dp[i] %= MOD;
-                        last[i][k] %= MOD;
-                    }
-                    else {
-                        break;
-                    }
-                }
+    vector <vector <int>> dp(x+1, vector <int> (n, 0));
+    for (int i = 0; i <= x; i++) {
+        int ind = 0;
+        for (auto c: coins) {
+            if (i - c > 0 && ind > 0) {
+                dp[i][ind] += dp[i-c][ind] + dp[i][ind-1];
             }
-            else {
-                last[i][k] = 1;
+            else if (i - c == 0) {
+                dp[i][ind] = 1;
             }
-            // debug(i);
-            // debug(k);
-            // debug(coins[k]);
-            // debug(last[i][k]);
+            ind++;
+        }
+        for (int j = 0; j < n; j++) {
+            printf("%d %d %d\n", i, coins[j], dp[i][j]);
         }
     }
-    printf("%d\n", dp[x]);
+    int ans = 0;
+    for (int i = 0; i < n; i++) {
+        ans += dp[x][i];
+        ans %= MOD;
+    }
+    printf("%d\n", ans);
 }
