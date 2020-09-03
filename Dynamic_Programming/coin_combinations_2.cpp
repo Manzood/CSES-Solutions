@@ -11,6 +11,10 @@ const int MOD = 1e9+7;
 // I feel close? I really hope to figure this out
 // log for 2nd Sept, I'm gonna call it quits for the moment. Memory limit exceeded, which is pretty unfortunate
 // I really managed to bring the complexity down to O(n*k), but at the cost of O((x+1)*n*2+n) memory, which is unfortunate
+// AHA
+// Rather than looking backwards, update it ahead of time!
+// Also, there's no need to update it repeatedly
+// update the state ahead of time as you get there
 
 int main() {
     int n, x;
@@ -20,38 +24,24 @@ int main() {
         scanf("%d", &coins[i]);
     }
     sort(coins.begin(), coins.end());
-    vector <vector <int>> dp(x+1, vector <int> (n, 0));
-    vector <vector <int>> sum(x+1, vector <int> (n, 0));
+    vector <vector <int>> dp(x+coins[n-1]+1, vector <int> (n, 0));
     for (int i = 0; i <= x; i++) {
         int ind = 0;
         for (auto c: coins) {
-            if (i - c > 0) {
-                // dp[i][ind] += dp[i-c][ind] + dp[i][ind-1];
-                dp[i][ind] += sum[i-c][ind];
-                if (ind > 0) {
-                    sum[i][ind] = dp[i][ind] + sum[i][ind-1];
-                }
-                else
-                    sum[i][ind] = dp[i][ind];
-            }
-            else if (i - c == 0) {
-                dp[i][ind] = 1;
-                if (ind > 0) {
-                    sum[i][ind] = dp[i][ind] + sum[i][ind-1];
-                }
-                else {
-                    sum[i][ind] = dp[i][ind];
-                }
+            // for each coin ahead, update the possibilities
+            if (i == 0) {
+                dp[i+c][ind] = 1;
             }
             else {
-                if (ind == 0) {
-                    sum[i][ind] = dp[i][ind];
-                }
-                else {
-                    sum[i][ind] = dp[i][ind] + sum[i][ind-1];
+                if (ind > 0 && i - c >= 0) {
+                    dp[i][ind] += dp[i][ind-1];
                 }
             }
+            dp[i+c][ind] += dp[i][ind];
             ind++;
+        }
+        for (int j = 0; j < n; j++) {
+            printf("%d %d %d\n", i, coins[j], dp[i][j]);
         }
     }
     int ans = 0;
