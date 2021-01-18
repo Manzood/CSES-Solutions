@@ -12,32 +12,45 @@ bool is_okay (int i, int j, vector <string>& a) {
 
 vector <pair <int, int>> pts = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 vector <vector <bool>> visited;
-string fin = "";
-bool dfs (vector <string>& a, int i, int j) {
-    if (visited[i][j]) return false;
-    bool ans = false;
-    visited[i][j] = true;
-    if (a[i][j] == 'B') {
-        return true;
-    }
+vector <char> fin;
+queue <pair<int, int>> q;
+
+bool proper_bfs (vector <string>& a) {
+    if (q.empty()) return false;
+    auto u = q.front();
+    int i = u.first;
+    int j = u.second;
+    debug(i);
+    debug(j);
+    q.pop();
+    bool retval = false;
     for (auto x: pts) {
         int x1 = i + x.first;
         int y1 = j + x.second;
-        if (is_okay (x1, y1, a)) {
-            bool cur = false;
-            cur = dfs (a, x1, y1);
-            if (ans) {
-                if (x.first == 1) fin += "D";
-                if (x.first == -1) fin += "U";
-                if (x.second == 1) fin += "R";
-                if (x.second == -1) fin += "L";
+        if (is_okay(x1, y1, a) && a[x1][y1] != '#' && !visited[x1][y1]) {
+            visited[x1][y1] = true;
+            if (x.first == 1 && x.second == 0) {
+                fin.push_back('D');
             }
-            ans |= cur;
+            if (x.first == -1 && x.second == 0) {
+                fin.push_back('U');
+            }
+            if (x.first == 0 && x.second == 1) {
+                fin.push_back('R');
+            }
+            if (x.first == 0 && x.second == -1) {
+                fin.push_back('L');
+            }
+            q.push({x1, y1});
+            if (a[x1][y1] == 'B') {
+                return true;
+            }
         }
     }
-    return ans;
+    retval |= proper_bfs(a);
+    if (retval == false) fin.pop_back();
+    return retval;
 }
-
 
 int32_t main () {
     int n, m;
@@ -53,7 +66,10 @@ int32_t main () {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             if (a[i][j] == 'A') {
-                ans = dfs(a, i, j);
+                // ans = dfs(a, i, j);
+                q.push({i, j});
+                visited[i][j] = true;
+                ans = proper_bfs(a);
             }
         }
     }
