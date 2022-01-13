@@ -1,9 +1,9 @@
 #include<bits/stdc++.h>
-using namespace std; 
+using namespace std;
 #define debug(x) cout<<#x<<" = "<<x<<endl;
-const int N = 2e6+5;
-const int INF = 1e9;
- 
+const int N = (int) 2e6+5;
+const int INF = (int) 1e9;
+
 bool ready[N];
 int solve[N];
 vector <int> a;
@@ -13,14 +13,14 @@ int recursive (int val) {
     // debug(ans);
     if (!ready[val]) {
         solve[val] = INF;
-        for (int i = 0; i < a.size(); i++) {
+        for (int i = 0; i < (int) a.size(); i++) {
             solve[val] = min(solve[val], recursive(val - a[i]) + 1);
         }
         ready[val] = true;
     }
     return solve[val];
 }
- 
+
 int main() {
     int n, x;
     scanf("%d %d", &n, &x);

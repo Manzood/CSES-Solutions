@@ -15,7 +15,7 @@ int main() {
     int first[x+1];
     value[0] = 0; first[0] = 0;
     for (int i = 1; i <= x; i++) {
-        value[i] = INF; 
+        value[i] = INF;
         for (int j = 0; j < n; j++) {
             // printing the first coin that appears in the sum
             if (i - coins[j] >= 0 && value[i] > value[i-coins[j]] + 1) {
