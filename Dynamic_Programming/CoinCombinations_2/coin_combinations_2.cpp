@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
 #define debug(x) cout << #x << " = " << x << endl;
 const int mod = (int)1e9 + 7;
@@ -16,11 +16,10 @@ int main() {
         scanf("%d", &coins[i]);
     }
     sort(coins.begin(), coins.end());
-    vector<vector<int>> dp(n);
+    vector<vector<int>> dp(n, vector <int> (x + 1, 0));
+    dp[0][0] = 1;
     for (int i = 0; i < n; i++) {
-        dp[i].resize(x + 1, 0);
         for (int j = 0; j <= x; j++) {
-            if (i == 0 && j == 0) dp[i][j] = 1;
             if (i > 0) dp[i][j] += dp[i - 1][j];
             if (j - coins[i] >= 0) dp[i][j] += dp[i][j - coins[i]];
             dp[i][j] %= mod;
