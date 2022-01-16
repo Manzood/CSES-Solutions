@@ -7,17 +7,15 @@ using namespace std;
 #define debug(...) 42;
 #endif
 
-#define int long long
-
 void solve() {
     int n, x;
-    scanf("%lld%lld", &n, &x);
+    scanf("%d%d", &n, &x);
     vector <int> price(n), a(n);
     for (int i = 0; i < n; i++) {
-        scanf("%lld", &price[i]);
+        scanf("%d", &price[i]);
     }
     for (int i = 0; i < n; i++) {
-        scanf("%lld", &a[i]);
+        scanf("%d", &a[i]);
     }
     vector <vector <int>> dp(n, vector <int> (x + 1, 0));
     for (int i = 0; i < n; i++) {
@@ -41,7 +39,7 @@ void solve() {
     //     }
     //     printf("\n");
     // }
-    printf("%lld\n", dp[n-1][x]);
+    printf("%d\n", dp[n-1][x]);
 }
 
 int32_t main() {
