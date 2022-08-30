@@ -12,19 +12,22 @@ using namespace std;
 bool check (vector <string>& board, int cur_i, int cur_j) {
     bool retval = true;
     for (int i = 0; i < 8; i++) {
-        if (i != cur_j && board[cur_i][i] == '*') retval = false;
-        if (i != cur_i && board[i][cur_j] == '*') retval = false;
+        if (i != cur_j && board[cur_i][i] == '#') retval = false;
+        if (i != cur_i && board[i][cur_j] == '#') retval = false;
     }
     return retval;
 }
 
 int n_queens (vector <string>& board, int rem) {
-    // place the first queen in row 1
     int retval = 0;
-    if (rem == 0) return retval;
+    if (rem == 0) return retval + 1;
     int row = 8 - rem;
     for (int j = 0; j < 8; j++) {
-        if (board[row][j] != '*' && check(board, row, j)) {
+        if (board[row][j] != '*' && board[row][j] != '#' && check(board, row, j)) {
+            board[row][j] = '#';
+            debug (board);
+            retval += n_queens(board, rem - 1);
+            board[row][j] = '.';
         }
     }
     return retval;

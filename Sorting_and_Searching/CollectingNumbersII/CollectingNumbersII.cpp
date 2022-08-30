@@ -9,41 +9,55 @@
 using namespace std;
 #define int long long
 
+void recompute(int val, vector<bool>& present, vector<int>& index) {
+    int n = (int)present.size() - 1;
+    present[val] = val > 1 ? index[val - 1] < index[val] : false;
+    if (val < n) {
+        val++;
+        present[val] = val > 1 ? index[val - 1] < index[val] : false;
+    }
+}
+
 void solve([[maybe_unused]] int test) {
     int n, m;
     scanf("%lld%lld", &n, &m);
-    vector <int> a(n);
-    vector <int> get_pos(n);
-    vector <int> get_num(n);
+    vector<int> a(n);
     for (int i = 0; i < n; i++) {
         scanf("%lld", &a[i]);
-        get_pos[a[i] - 1] = i;
-        get_num[i] = a[i];
     }
-    int ans = 1;
-    for (int i = 1; i < n; i++) {
-        if (get_pos[i-1] < get_pos[i]) ans++;
+    vector<bool> present(n + 1, false);
+    vector<bool> found(n + 1, false);
+    vector<int> index(n + 1, -1);
+    for (int i = 0; i < n; i++) {
+        if (found[a[i] - 1]) present[a[i]] = true;
+        found[a[i]] = true;
+        index[a[i]] = i;
+    }
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!present[i]) ans++;
     }
     for (int i = 0; i < m; i++) {
         int x, y;
         scanf("%lld%lld", &x, &y);
-        x--; y--;
-        int num1 = get_num[x] - 1;
-        int num2 = get_num[y] - 1;
-        // debug (num1, num2);
-        if (num1 - 1 >= 0 && get_pos[num1] < get_pos[num1 - 1]) ans--;
-        if (num1 != num2 - 1 && num2 - 1 >= 0 && get_pos[num2] < get_pos[num2 - 1]) ans--;
-        if (num1 + 1 < n && get_pos[num1 + 1] < get_pos[num1]) ans--;
-        if (num1 != num2 + 1 && num2 + 1 < n && get_pos[num2 + 1] < get_pos[num2]) ans--;
-        // debug (ans);
-        swap (a[x], a[y]);
-        swap (get_num[x], get_num[y]);
-        swap (get_pos[num1], get_pos[num2]);
-        // debug (a, get_pos, ans, num1, num2);
-        if (num1 - 1 >= 0 && get_pos[num1] < get_pos[num1 - 1]) ans++;
-        if (num1 != num2 - 1 && num2 - 1 >= 0 && get_pos[num2] < get_pos[num2 - 1]) ans++;
-        if (num1 + 1 < n && get_pos[num1 + 1] < get_pos[num1]) ans++;
-        if (num1 != num2 + 1 && num2 + 1 < n && get_pos[num2 + 1] < get_pos[num2]) ans++;
+        x = a[x - 1];
+        y = a[y - 1];
+        int x_ind = index[y];
+        int y_ind = index[x];
+        index[x] = x_ind;
+        index[y] = y_ind;
+        a[index[x]] = x;
+        a[index[y]] = y;
+        if (!present[x]) ans--;
+        if (!present[y]) ans--;
+        if (x + 1 <= n && x + 1 != y && !present[x + 1]) ans--;
+        if (y + 1 <= n && y + 1 != x && !present[y + 1]) ans--;
+        recompute(x, present, index);
+        recompute(y, present, index);
+        if (!present[x]) ans++;
+        if (!present[y]) ans++;
+        if (x + 1 <= n && x + 1 != y && !present[x + 1]) ans++;
+        if (y + 1 <= n && y + 1 != x && !present[y + 1]) ans++;
         printf("%lld\n", ans);
     }
 }

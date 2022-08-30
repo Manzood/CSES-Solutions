@@ -9,25 +9,42 @@
 using namespace std;
 #define int long long
 
-bool check (vector <string>& board, int cur_i, int cur_j) {
+bool checkspot(int x, int y, vector <string>& board) {
     bool retval = true;
+    retval &= board[x][y] == '.';
     for (int i = 0; i < 8; i++) {
-        if (i != cur_j && board[cur_i][i] == '#') retval = false;
-        if (i != cur_i && board[i][cur_j] == '#') retval = false;
+        retval &= board[i][y] != 'q';
+        retval &= board[x][i] != 'q';
+    }
+    for (int i = min(x, y); i > 0; i--) {
+        retval &= board[x - i][y - i] != 'q';
+    }
+    for (int i = max(x, y) + 1; i < 8; i++) {
+        int diff = i - max(x, y);
+        retval &= board[x + diff][y + diff] != 'q';
+    }
+    int tempx = x, tempy = y;
+    while (tempx >= 0 && tempy < 8) {
+        retval &= board[tempx][tempy] != 'q';
+        tempx--; tempy++;
+    }
+    tempx = x; tempy = y;
+    while (tempx < 8 && tempy >= 0) {
+        retval &= board[tempx][tempy] != 'q';
+        tempx++; tempy--;
     }
     return retval;
 }
 
-int n_queens (vector <string>& board, int rem) {
+int getans (int row, vector <string>& board) {
+    if (row >= 8) return 0;
     int retval = 0;
-    if (rem == 0) return retval + 1;
-    int row = 8 - rem;
-    for (int j = 0; j < 8; j++) {
-        if (board[row][j] != '*' && board[row][j] != '#' && check(board, row, j)) {
-            board[row][j] = '#';
-            debug (board);
-            retval += n_queens(board, rem - 1);
-            board[row][j] = '.';
+    for (int i = 0; i < 8; i++) {
+        if (checkspot(row, i, board)) {
+            board[row][i] = 'q';
+            retval += getans(row + 1, board);
+            board[row][i] = '.';
+            if (row == 7) retval++;
         }
     }
     return retval;
@@ -38,8 +55,7 @@ void solve([[maybe_unused]] int test) {
     for (int i = 0; i < 8; i++) {
         cin >> board[i];
     }
-    debug (board);
-    int ans = n_queens(board, 8);
+    int ans = getans(0, board);
     printf("%lld\n", ans);
 }
 
