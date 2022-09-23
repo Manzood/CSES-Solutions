@@ -14,15 +14,18 @@ constexpr int MAX_N = (int)1e5 + 1;
 void solve([[maybe_unused]] int test) {
     int n;
     scanf("%lld", &n);
-    vector<int> coins(n);
+    vector<int> a(n);
     for (int i = 0; i < n; i++) {
-        scanf("%lld", &coins[i]);
+        scanf("%lld", &a[i]);
     }
+    sort(a.begin(), a.end());
     vector<bool> dp(MAX_N, false);
     dp[0] = true;
     for (int i = 0; i < n; i++) {
-        for (int j = MAX_N; j >= coins[i]; j--) {
-            dp[j] = dp[j] | dp[j - coins[i]];
+        for (int j = MAX_N - 1; j >= 0; j--) {
+            if (j - a[i] >= 0) {
+                dp[j] = dp[j] | dp[j - a[i]];
+            }
         }
     }
     vector<int> ans;
