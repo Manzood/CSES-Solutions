@@ -8,23 +8,26 @@
 
 using namespace std;
 #define int long long
-constexpr int inf = (int) 1e18;
 
-template <class T>
-using min_heap = priority_queue<T, vector<T>, greater<T>>;
+constexpr int INF = (int)1e18;
 
-void dijkstra(vector<vector<vector<int>>>& adj) {
-    int n = adj.size();
-    priority_queue<vector <int>, vector<vector <int>>, greater<vector <int>>> min_pq;
-    min_pq.push({0, 0});
-    for (int i = 1; i < n; i++) {
-        min_pq.push({inf, i});
-    }
-    while (!min_pq.empty()) {
-        vector <int> cur = min_pq.top();
-        int node = cur[1];
-        int dist = cur[0];
-        for (auto& u: adj[node]) {
+vector<int> visited;
+
+void dijkstra(vector<vector<pair<int, int>>>& adj, set<pair<int, int>>& s,
+              vector<int>& d) {
+    while (!s.empty()) {
+        int node = s.begin()->second;
+        int value = s.begin()->first;
+        s.erase(s.begin());
+        for (auto u : adj[node]) {
+            // get the value for u
+            int cur = d[u.first];
+            if (s.find({cur, u.first}) != s.end()) {
+                s.erase(s.find({cur, u.first}));
+                cur = min(cur, value + u.second);
+                s.insert({cur, u.first});
+                d[u.first] = cur;
+            }
         }
     }
 }
@@ -32,15 +35,25 @@ void dijkstra(vector<vector<vector<int>>>& adj) {
 void solve([[maybe_unused]] int test) {
     int n, m;
     scanf("%lld%lld", &n, &m);
-    vector<vector<vector<int>>> adj(n);
+    vector<vector<pair<int, int>>> adj(n);
     for (int i = 0; i < m; i++) {
         int a, b, c;
         scanf("%lld%lld%lld", &a, &b, &c);
-        a--;
-        b--;
-        adj[a].push_back({b, c});
-        adj[b].push_back({a, c});
+        adj[a - 1].push_back({b - 1, c});
     }
+    visited.clear();
+    visited.assign(n, false);
+    vector<int> d(n, INF);
+    d[0] = 0;
+    set<pair<int, int>> s;
+    for (int i = 0; i < n; i++) {
+        s.insert({d[i], i});
+    }
+    dijkstra(adj, s, d);
+    for (int i = 0; i < n; i++) {
+        printf("%lld ", d[i]);
+    }
+    printf("\n");
 }
 
 int32_t main() {
