@@ -9,44 +9,37 @@
 using namespace std;
 #define int long long
 
-vector<int> visited, val;
+vector<int> visited;
 
-int dfs1(int node, vector<vector<int>>& adj) {
+pair<int, int> bfs(int node, vector<vector<int>>& adj) {
+    queue<pair<int, int>> q;
+    int n = (int)adj.size();
+    visited.assign(n, false);
+    q.push({node, 0});
     visited[node] = true;
-    vector<int> t;
-    int mx = 0, mx2 = 0;
-    for (auto u : adj[node]) {
-        if (!visited[u]) {
-            int cur = dfs1(u, adj) + 1;
-            if (node == 0) t.push_back(cur);
-            if (mx <= cur) {
-                mx2 = mx;
-                mx = cur;
+    pair<int, int> last;
+    while (!q.empty()) {
+        pair<int, int> cur = q.front();
+        last = q.front();
+        q.pop();
+        // debug(last);
+        for (auto u : adj[cur.first]) {
+            if (!visited[u]) {
+                visited[u] = true;
+                q.push({u, cur.second + 1});
             }
         }
     }
-    for (auto x : t) {
-        if (x == mx) {
-            val.push_back(mx2);
-        } else {
-            val.push_back(mx);
-        }
-    }
-    return mx;
+    return last;
 }
 
-int dfs2(int node, vector<vector<int>>& adj, int mx, vector<int>& ans,
-         int depth) {
-    if (visited[node]) return 0;
-    int retval = 0;
+void getdist(int node, vector<vector<int>>& adj, vector<int>& dist, int depth) {
+    if (visited[node]) return;
     visited[node] = true;
-    ans[node] = depth + mx;
-    for (auto x : adj[node]) {
-        int cur = dfs2(x, adj, mx, ans, depth + 1);
-        retval = max(retval, cur + 1);
+    dist[node] = depth;
+    for (auto u : adj[node]) {
+        getdist(u, adj, dist, depth + 1);
     }
-    ans[node] = max(ans[node], retval);
-    return retval;
 }
 
 void solve([[maybe_unused]] int test) {
@@ -62,16 +55,18 @@ void solve([[maybe_unused]] int test) {
         adj[b].push_back(a);
     }
     vector<int> ans(n, 0);
+    pair<int, int> firstedge = bfs(0, adj);
+    pair<int, int> secondedge = bfs(firstedge.first, adj);
+    // find the distance from each node to either of the edges, i.e. the
+    // distance from each of the edges to each node
+    vector<int> dist1(n, 0), dist2(n, 0);
     visited.assign(n, false);
-    ans[0] = dfs1(0, adj);
-    debug(ans, val);
-    for (int i = 0; i < (int)adj[0].size(); i++) {
-        visited.assign(n, false);
-        visited[0] = true;
-        dfs2(adj[0][i], adj, val[i], ans, 1);
-    }
+    getdist(firstedge.first, adj, dist1, 0);
+    visited.assign(n, false);
+    getdist(secondedge.first, adj, dist2, 0);
+    // debug(dist1, dist2);
     for (int i = 0; i < n; i++) {
-        printf("%lld ", ans[i]);
+        printf("%lld ", max(dist1[i], dist2[i]));
     }
     printf("\n");
 }
