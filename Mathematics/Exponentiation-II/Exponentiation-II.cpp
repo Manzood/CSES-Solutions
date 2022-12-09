@@ -8,48 +8,24 @@
 
 using namespace std;
 #define int long long
-const int mod = (int) 1e9 + 7;
 
-int ans = 1;
+constexpr int mod = (int)1e9 + 7;
 
-int standard_binexp(int a, int b) {
-    if (b == 0) return 1;
-    int val = standard_binexp(a, b / 2);
-    return ((val * val % mod) * (b & 1 ? a : 1) % mod);
-}
-
-int binexp(int a, int b, int c) {
-    int retval = 1;
-    if (c == 0) return retval;
-    int val = binexp(a, b, c / 2); // O(log(c)) -> 32
-    retval = val * val;
-    assert (retval >= 0);
-    if (retval >= mod) {
-        int diff = retval - (retval % mod);
-        assert (diff >= 0);
-        ans = ans * standard_binexp(a, diff) % mod; // O(log(diff)) -> 64
-        assert (ans >= 0);
-        retval %= mod;
+long long power(long long a, long long b, long long m) {
+    long long result = 1;
+    while (b) {
+        if (b % 2 == 1) result = result * a % m;
+        a = a * a % m;
+        b /= 2;
     }
-    retval = retval * (c & 1 ? b : 1);
-    assert (retval >= 0);
-    if (retval >= mod) {
-        int diff = retval - (retval % mod);
-        assert (diff >= 0);
-        ans = ans * standard_binexp(a, diff) % mod; // O(log(diff)) -> 64
-        assert (ans >= 0);
-        retval %= mod;
-    }
-    return retval;
+    return result;
 }
 
 void solve() {
     int a, b, c;
-    ans = 1;
     scanf("%lld%lld%lld", &a, &b, &c);
-    int val = binexp (a, b, c); // 32 * 128 ops max?
-    ans = ans * standard_binexp (a, val) % mod;
-    assert (ans >= 0);
+    int exp = power(b, c, mod - 1);
+    int ans = power(a, exp, mod);
     printf("%lld\n", ans);
 }
 
