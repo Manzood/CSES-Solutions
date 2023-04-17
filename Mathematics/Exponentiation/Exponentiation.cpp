@@ -8,18 +8,18 @@
 
 using namespace std;
 #define int long long
-const int mod = (int) 1e9+7;
+const int mod = (int)1e9 + 7;
 
-int binexp (int a, int b, int m) {
+int binexp(int a, int b, int m) {
     if (b == 0) return 1;
-    int val = binexp (a, b / 2, m);
+    int val = binexp(a, b / 2, m);
     return ((val * val % m) * (b & 1 ? a : 1) % m);
 }
 
 void solve() {
     int a, b;
     scanf("%lld%lld", &a, &b);
-    int ans = binexp (a, b, mod);
+    int ans = binexp(a, b, mod);
     printf("%lld\n", ans);
 }
 

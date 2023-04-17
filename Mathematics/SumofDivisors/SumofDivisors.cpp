@@ -9,19 +9,27 @@
 using namespace std;
 #define int long long
 
+constexpr int MOD = (int)1e9 + 7;
+
+long long inv(long long a, long long m) {
+    return 1 < a ? m - inv(m % a, a) * m / a : 1;
+}
+
 void solve([[maybe_unused]] int test) {
     int n;
-    scanf("%lld", &n);
+    cin >> n;
     int ans = 0;
     for (int i = 1; i * i <= n; i++) {
-        if (i * i != n) {
-            ans += n / i;
-            ans += i;
-        } else {
-            ans += i;
-        }
+        (ans += i) %= MOD;
+        int num = (n - i * i) / i;
+        int first_term = 2 * ((i * i % MOD) + i % MOD) % MOD;
+        int second_term = ((num % MOD) - 1) * i % MOD;
+        if (second_term < MOD) second_term += MOD;
+        int prod = (num % MOD) * (first_term + second_term % MOD) % MOD;
+        (ans += (prod * inv(2, MOD) % MOD) * inv(i, MOD) % MOD) %= MOD;
+        (ans += ((num % MOD) * i % MOD)) %= MOD;
     }
-    printf("%lld\n", ans);
+    cout << ans << "\n";
 }
 
 int32_t main() {
