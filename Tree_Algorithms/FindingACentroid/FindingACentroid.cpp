@@ -9,37 +9,25 @@
 using namespace std;
 #define int long long
 
-int get_subtree(int node, int par, vector<vector<int>>& adj,
-                vector<int>& subtree) {
-    if (subtree[node] > -1) return subtree[node];
+int dfs(int node, vector<vector<int>>& adj, vector<int>& subtree,
+        vector<bool>& vis) {
+    if (vis[node]) return 0;
+    vis[node] = true;
     subtree[node] = 1;
     for (auto u : adj[node]) {
-        if (u == par) continue;
-        subtree[node] += get_subtree(u, node, adj, subtree);
+        subtree[node] += dfs(u, adj, subtree, vis);
     }
     return subtree[node];
 }
 
-int find_centroid(int node, vector<vector<int>>& adj, vector<int>& subtree) {
-    int root = node;
-    int mx = 0;
-    int mx_node = -1;
-    for (auto u : adj[node]) {
-        int val = get_subtree(u, node, adj, subtree);
-        if (val > mx) {
-            mx = val;
-            mx_node = u;
-        }
-    }
-    if (mx > (int)adj.size() / 2) {
-        subtree[node] = 1;
-        for (auto u : adj[node]) {
-            if (u == mx_node) continue;
-            subtree[node] += subtree[u];
-        }
-        root = find_centroid(mx_node, adj, subtree);
-    }
-    return root;
+int centroid(int root, vector<vector<int>>& adj, vector<int>& subtree) {
+    int ele = -1;
+    int n = (int)adj.size();
+    for (auto u : adj[root])
+        if (subtree[u] > n / 2) ele = u;
+    if (ele == -1) return root;
+    subtree[root] = n - subtree[ele];
+    return centroid(ele, adj, subtree);
 }
 
 void solve([[maybe_unused]] int test) {
@@ -49,14 +37,14 @@ void solve([[maybe_unused]] int test) {
     for (int i = 0; i < n - 1; i++) {
         int u, v;
         scanf("%lld%lld", &u, &v);
-        u--;
-        v--;
+        u--, v--;
         adj[u].push_back(v);
         adj[v].push_back(u);
     }
-    vector<int> subtree(n, -1);
-    get_subtree(0, -1, adj, subtree);
-    int root = find_centroid(0, adj, subtree);
+    vector<int> subtree(n, 0);
+    vector<bool> vis(n, false);
+    dfs(0, adj, subtree, vis);
+    int root = centroid(0, adj, subtree);
     printf("%lld\n", root + 1);
 }
 

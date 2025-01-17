@@ -13,22 +13,24 @@ void solve([[maybe_unused]] int test) {
     int n, t;
     scanf("%lld%lld", &n, &t);
     vector<int> a(n);
-    for (int i = 0; i < n; i++) {
-        scanf("%lld", &a[i]);
-    }
-    sort(a.begin(), a.end());
-    debug(a);
-    int ans = (int)1e9 + 7;
     float inv = 0.0f;
     for (int i = 0; i < n; i++) {
-        int cnt = (int)(inv * a[i]) + 1;
-        debug(cnt);
-        if (cnt >= t) {
-            ans = min(ans, a[i]);
-        }
+        scanf("%lld", &a[i]);
         inv += (float)1.0f / a[i];
-        int fin = ((t + cnt - 1) / cnt) * a[i];
-        ans = min(ans, fin);
+    }
+    int ans = 0;
+    int low = 1;
+    int high = (int)1e9 + 7;
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        int val = (int)((float)mid * inv);
+        if (val >= t) {
+            debug((float)mid * inv);
+            ans = val;
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
     }
     printf("%lld\n", ans);
 }

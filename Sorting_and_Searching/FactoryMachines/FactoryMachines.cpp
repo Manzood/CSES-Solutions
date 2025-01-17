@@ -9,30 +9,33 @@
 using namespace std;
 #define int long long
 
+bool check(vector<int>& a, int val, int t) {
+    int n = (int)a.size();
+    int cnt = 0;
+    for (int i = 0; i < n; i++) {
+        cnt += val / a[i];
+        if (cnt >= t) return true;
+    }
+    return cnt >= t;
+}
+
 void solve([[maybe_unused]] int test) {
     int n, t;
     scanf("%lld%lld", &n, &t);
     vector<int> a(n);
-    float inv = 0.0f;
     for (int i = 0; i < n; i++) {
         scanf("%lld", &a[i]);
-        inv += (float)1.0f / a[i];
     }
-    int ans = 0;
-    int low = 1;
-    int high = (int)1e9 + 7;
-    while (low <= high) {
+    int low = 0, high = (int)1e18 + 7;
+    while (low < high) {
         int mid = (low + high) / 2;
-        int val = (int)((float)mid * inv);
-        if (val >= t) {
-            debug((float)mid * inv);
-            ans = val;
-            high = mid - 1;
+        if (check(a, mid, t)) {
+            high = mid;
         } else {
             low = mid + 1;
         }
     }
-    printf("%lld\n", ans);
+    printf("%lld\n", high);
 }
 
 int32_t main() {
