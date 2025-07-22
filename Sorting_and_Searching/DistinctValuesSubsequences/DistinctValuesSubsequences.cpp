@@ -11,35 +11,24 @@ using namespace std;
 
 constexpr int MOD = (int)1e9 + 7;
 
-template <typename T>
-T getpow(T a, T b, T m) {
-    T result = 1;
-    while (b) {
-        if (b % 2 == 1) result = result * a % m;
-        a = a * a % m;
-        b /= 2;
-    }
-    return result;
-}
-
 void solve([[maybe_unused]] int test) {
     int n;
     scanf("%lld", &n);
     vector<int> a(n);
+    map<int, int> occ;
     for (int i = 0; i < n; i++) {
         scanf("%lld", &a[i]);
+        occ[a[i]]++;
     }
 
-    set<int> s;
-    s.insert(a[0]);
     int ans = 1;
-    for (int i = 1; i < n; i++) {
-        int x = s.size();
-        if (s.count(a[i])) x--;
-        ans += getpow(2LL, x, MOD);
+    for (auto pp : occ) {
+        ans *= (pp.second + 1);
         ans %= MOD;
-        debug(i, ans);
     }
+
+    ans--;
+    if (ans < 0) ans += MOD;
 
     printf("%lld\n", ans);
 }
