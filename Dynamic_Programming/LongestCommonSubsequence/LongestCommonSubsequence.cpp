@@ -1,7 +1,7 @@
 #include "bits/stdc++.h"
 
 #ifdef local
-#include "custom/debugger.h"
+#include "custom/tempDebugger.h"
 #else
 #define debug(...) 42;
 #endif
@@ -19,32 +19,50 @@ void solve([[maybe_unused]] int test) {
     for (int i = 0; i < m; i++) {
         scanf("%lld", &b[i]);
     }
+
     vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
-    vector<vector<int>> last(n + 1, vector<int>(m + 1, -1));
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= m; j++) {
-            if (a[i - 1] == b[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                last[i][j] = i - 1;
+    vector<vector<pair<int, int>>> prev(
+        n + 1, vector<pair<int, int>>(
+                   m + 1, {-1, -1}));  // keeps track of the previous increase
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            prev[i + 1][j + 1] = prev[i][j];
+            if (a[i] == b[j]) {
+                dp[i + 1][j + 1] = dp[i][j] + 1;
+                prev[i + 1][j + 1] = {i, j};
             } else {
-                if (dp[i][j - 1] > dp[i - 1][j]) {
-                    dp[i][j] = dp[i][j - 1];
-                    last[i][j] = last[i][j - 1];
-                } else {
-                    dp[i][j] = dp[i - 1][j];
-                    last[i][j] = last[i - 1][j];
+                if (dp[i][j + 1] > dp[i + 1][j + 1]) {
+                    dp[i + 1][j + 1] = dp[i][j + 1];
+                    prev[i + 1][j + 1] = prev[i][j + 1];
+                }
+                if (dp[i + 1][j] > dp[i + 1][j + 1]) {
+                    dp[i + 1][j + 1] = dp[i + 1][j];
+                    prev[i + 1][j + 1] = prev[i + 1][j];
                 }
             }
         }
     }
-    printf("%lld\n", dp[n][m]);
-    int cur = last[n][m];
-    if (dp[n][m] > 0) {
-        vector<int> out;
-        while (cur >= 0) {
-            out.push_back(a[cur]);
+
+    vector<int> ans;
+    pair<int, int> cur = prev[n][m];
+    while (cur != make_pair(-1LL, -1LL)) {
+        assert(cur.first >= 0 && cur.second >= 0);
+        ans.push_back(a[cur.first]);
+        if (prev[cur.first][cur.second] == cur) {
+            cur.first--;
+            cur.second--;
+        } else {
+            cur = prev[cur.first][cur.second];
         }
     }
+
+    assert((int)ans.size() == dp[n][m]);
+    printf("%lld\n", dp[n][m]);
+    reverse(ans.begin(), ans.end());
+    for (auto x : ans) {
+        printf("%lld ", x);
+    }
+    printf("\n");
 }
 
 int32_t main() {
